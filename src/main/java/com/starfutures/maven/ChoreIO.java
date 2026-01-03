@@ -3,9 +3,11 @@ package com.starfutures.maven;
 import javax.swing.JOptionPane; //FIXME: delete, library used for debugging
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +19,11 @@ public class ChoreIO {
 	CSVReader csvReader; //create a reference to a csv reader.
 	private List<String[]> itemList = new ArrayList<>();
 	private String basePath; //string to store the path to the app.
-	private String chorePath = "/Inputs/ChorePool.csv"; // the path/name of the chore list file.
-	private String peoplePath = "/Inputs/PeoplePool.csv"; //the path for the list of people.
-	private String outputPath = "/Output/ChoreList.csv";
+	private String chorePath = "/ChoreListGenerator_Inputs/ChorePool.csv"; // the path/name of the chore list file.
+	private String peoplePath = "/ChoreListGenerator_Inputs/PeoplePool.csv"; //the path for the list of people.
+	private String outputPath = "/ChorelistGenerator_Output/ChoreList.csv";
+	private static String templateChorePath = "/templates/ChorePool.csv";
+	private static String templatePeoplePath = "/templates/PeoplePool.csv";
 	private List<String[]> peoplePool;
 	private List<String[]> chorePool;
 	private boolean includesWorkload;
@@ -39,6 +43,8 @@ public class ChoreIO {
 		/*JOptionPane.showMessageDialog(null, "relative Paths: " + chorePath + "\n" + peoplePath, "Chore List Generator", 
                 JOptionPane.INFORMATION_MESSAGE);*/ //FIXME: this and previous lines are for debug.
 		
+		enforceIOFolders(chorePath, peoplePath, outputPath);
+		
 		//uses the default file paths.
 		this.peoplePool = readCSV(peoplePath);
 		this.chorePool = readCSV(chorePath);
@@ -46,6 +52,7 @@ public class ChoreIO {
 		sanitizeChoreInput();
 		sanitizePeopleInput();
 	} 
+	
 	//overloaded constructor where file paths are specified.
 	ChoreIO(String chorePath, String peoplePath)
 	{	
@@ -115,6 +122,64 @@ public class ChoreIO {
 		}
 
 		
+	}
+	
+	private static void enforceIOFolders(String chorePath, String peoplePath, String outputPath)
+	{
+		File choreFile = new File(chorePath);
+		File peopleFile = new File(peoplePath);
+		File inputFolder = choreFile.getParentFile();
+		File outputFolder = new File(outputPath).getParentFile(); //it says getParentFile but it gets folders too.
+		
+		if(choreFile.exists() && peopleFile.exists() && outputFolder.exists())
+		{
+			return; //If both the input files and the output folder already exist, just return, do not need to bother making new ones.
+		}
+		
+		//make the outputs folder if it doesn't exist.
+		if(!outputFolder.exists())
+		{
+			outputFolder.mkdir();
+		}
+		
+		//if the input folder doesn't exist, make a new folder and add the csv files into it.
+		if(!inputFolder.exists())
+		{
+			inputFolder.mkdirs();
+			
+			copyFile(templateChorePath, choreFile);
+			copyFile(templatePeoplePath, peopleFile);
+			
+			return; //if this has been done, then nothing is left missing.
+		}
+		
+		if(!choreFile.exists())
+		{
+			copyFile(templateChorePath, choreFile);
+		}
+		if(!peopleFile.exists())
+		{
+			copyFile(templatePeoplePath, peopleFile);
+		}
+		return;
+	}
+	
+	private static void copyFile(String originalPath, File cloneFile)
+	{
+		try(InputStream in = App.class.getResourceAsStream(originalPath);
+				FileOutputStream out = new FileOutputStream(cloneFile))
+		{
+			byte[] buffer = new byte[1024];
+			int bytesRead;
+			while((bytesRead = in.read(buffer)) != -1)
+			{
+				out.write(buffer, 0, bytesRead); 
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	//Reads the specified CSV file.
