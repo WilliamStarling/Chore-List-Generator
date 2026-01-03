@@ -1,5 +1,7 @@
 package com.starfutures.maven;
 
+import javax.swing.JOptionPane; //FIXME: delete, library used for debugging
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -14,9 +16,10 @@ public class ChoreIO {
 	FileReader fileReader; //create a reference to a file reader
 	CSVReader csvReader; //create a reference to a csv reader.
 	private List<String[]> itemList = new ArrayList<>();
-	private String chorePath = "Inputs/ChorePool.csv"; // the path/name of the chore list file.
-	private String peoplePath = "Inputs/PeoplePool.csv"; //the path for the list of people.
-	private final String outputPath = "Output/ChoreList.csv";
+	private String basePath; //string to store the path to the app.
+	private String chorePath = "/Inputs/ChorePool.csv"; // the path/name of the chore list file.
+	private String peoplePath = "/Inputs/PeoplePool.csv"; //the path for the list of people.
+	private String outputPath = "/Output/ChoreList.csv";
 	private List<String[]> peoplePool;
 	private List<String[]> chorePool;
 	private boolean includesWorkload;
@@ -27,6 +30,15 @@ public class ChoreIO {
 	//default constructor with predefined paths.
 	ChoreIO()
 	{	
+		basePath = findApplicationDirectory();
+	    
+		this.chorePath = basePath.concat(chorePath); //adds the location of the folders onto the relative path.
+		this.peoplePath = basePath.concat(peoplePath);
+		this.outputPath = basePath.concat(outputPath); //goes ahead and updates the output path too.
+		//System.out.println("relative Paths: " + chorePath + "\n" + peoplePath);
+		/*JOptionPane.showMessageDialog(null, "relative Paths: " + chorePath + "\n" + peoplePath, "Chore List Generator", 
+                JOptionPane.INFORMATION_MESSAGE);*/ //FIXME: this and previous lines are for debug.
+		
 		//uses the default file paths.
 		this.peoplePool = readCSV(peoplePath);
 		this.chorePool = readCSV(chorePath);
@@ -36,7 +48,7 @@ public class ChoreIO {
 	} 
 	//overloaded constructor where file paths are specified.
 	ChoreIO(String chorePath, String peoplePath)
-	{
+	{	
 		this.chorePath = chorePath;
 		this.peoplePath = peoplePath;
 		
@@ -45,6 +57,64 @@ public class ChoreIO {
 		
 		sanitizeChoreInput();
 		sanitizePeopleInput();
+	}
+	
+	private String findApplicationDirectory()
+	{
+		String directoryPath;
+		String osName;
+		try
+		{
+			String jarPath = App.class.getProtectionDomain()
+		            .getCodeSource()
+		            .getLocation()
+		            .toURI()
+		            .getPath();
+			File jarFile =  new File(jarPath);
+			
+			//if it's a directory, this means it's running in an IDE. in Eclipse, it needs to go a level up from target.
+			if(jarFile.isDirectory())
+			{
+				directoryPath = jarFile.getParentFile().getParent(); //go up from taget/classes
+				return directoryPath; //go ahead and return the path, don't need to check other conditions.
+			}
+			
+			//get the OS name.
+			osName = System.getProperty("os.name").toLowerCase();
+			
+			/*
+			 * On Mac's. the javaFile is going to read as being in
+			 * ChoreListGenerator.app/Contents/App, when we need it to just be in the same folder as ChoreListGenerator.
+			 */
+			if (osName.contains("mac"))
+			{
+				directoryPath = jarFile.getParentFile() //enters app/
+						.getParentFile() //enters Contents/
+						.getParentFile() // enters ChoreListGenerator.app/
+						.getParent(); // enters parent folder
+			}
+			//in Windows computers, the .exe is just the normal directory.
+			else if(osName.contains("windows"))
+			{
+				directoryPath = jarFile.getParent();
+			}
+			//Unknown other OS (probably Linux)
+			else
+			{
+				throw new IOException ("ERROR: Unknown OS in use. Application only supports Windows and MacOS computers.");
+			}
+			
+			return directoryPath; //return the path.
+			
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+			directoryPath = System.getProperty("user.dir");
+			return directoryPath;
+		}
+
+		
 	}
 	
 	//Reads the specified CSV file.
