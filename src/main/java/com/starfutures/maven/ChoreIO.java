@@ -130,37 +130,54 @@ public class ChoreIO {
 		File peopleFile = new File(peoplePath);
 		File inputFolder = choreFile.getParentFile();
 		File outputFolder = new File(outputPath).getParentFile(); //it says getParentFile but it gets folders too.
+		boolean createdFile = true;
 		
-		if(choreFile.exists() && peopleFile.exists() && outputFolder.exists())
+		try
 		{
-			return; //If both the input files and the output folder already exist, just return, do not need to bother making new ones.
-		}
-		
-		//make the outputs folder if it doesn't exist.
-		if(!outputFolder.exists())
-		{
-			outputFolder.mkdir();
-		}
-		
-		//if the input folder doesn't exist, make a new folder and add the csv files into it.
-		if(!inputFolder.exists())
-		{
-			inputFolder.mkdirs();
+			if(choreFile.exists() && peopleFile.exists() && outputFolder.exists())
+			{
+				return; //If both the input files and the output folder already exist, just return, do not need to bother making new ones.
+			}
 			
-			copyFile(templateChorePath, choreFile);
-			copyFile(templatePeoplePath, peopleFile);
+			//make the outputs folder if it doesn't exist.
+			if(!outputFolder.exists())
+			{
+				createdFile = outputFolder.mkdir();
+				if(!createdFile)
+				{
+					throw new IOException("ERROR: failed to create output folder. Application likely installed in location where it does not have permissions. Please install in different location, like desktop.");
+				}
+			}
 			
-			return; //if this has been done, then nothing is left missing.
+			//if the input folder doesn't exist, make a new folder and add the csv files into it.
+			if(!inputFolder.exists())
+			{
+				createdFile = inputFolder.mkdirs();
+				if(!createdFile)
+				{
+					throw new IOException("ERROR: failed to create input folder. Application likely installed in location where it does not have permissions. Please install in different location, like desktop.");
+				}
+				
+				copyFile(templateChorePath, choreFile);
+				copyFile(templatePeoplePath, peopleFile);
+				
+				return; //if this has been done, then nothing is left missing.
+			}
+			
+			if(!choreFile.exists())
+			{
+				copyFile(templateChorePath, choreFile);
+			}
+			if(!peopleFile.exists())
+			{
+				copyFile(templatePeoplePath, peopleFile);
+			}	
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
 		}
 		
-		if(!choreFile.exists())
-		{
-			copyFile(templateChorePath, choreFile);
-		}
-		if(!peopleFile.exists())
-		{
-			copyFile(templatePeoplePath, peopleFile);
-		}
 		return;
 	}
 	
@@ -178,6 +195,7 @@ public class ChoreIO {
 		}
 		catch (Exception e)
 		{
+			System.out.println("ERROR: failed to create template files. Application likely installed in location where it does not have permissions. Please install in different location, like desktop.");
 			e.printStackTrace();
 		}
 	}
