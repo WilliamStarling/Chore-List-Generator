@@ -41,6 +41,8 @@ public class GenerateList
 			generateList();
 			
 			//turn the collection of chore people into a single list of string arrays.
+			//FIXME: It is worth noting that after enabling formatting, the combing of chore boy lists happens inside the output class now. 
+			//So the formatting functions and involved variables are no longer needed.
 			formatChoreList();			
 		} 
 		catch (Exception e)
@@ -127,6 +129,12 @@ public class GenerateList
 	public List<String[]> getChoreList()
 	{
 		return this.choreList;
+	}
+	
+	//GETTER method: returns the group of chore boys, each with a set of chores.
+	public List<ChoreBoy> getChoreBoyList()
+	{
+		return this.choreBoyList;
 	}
 	
 }

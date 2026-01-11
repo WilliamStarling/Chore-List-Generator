@@ -2,6 +2,8 @@ package com.starfutures.maven;
 
 import javax.swing.JOptionPane; //FIXME: delete, library used for debugging
 
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
@@ -66,6 +69,96 @@ public class ChoreIO {
 		sanitizePeopleInput();
 	}
 	
+	//called from main class to actually create the output file.
+	//This method is no longer used, The other version below is instead in favor of having formatting.
+	//it might not work, since it tries to write a csv object to a file with .xlsx extension.
+	//tried to overload the methods, but didn't work since both parameters were of type list.
+	public void outputListOld(List<String[]> choreList)
+	{
+		String[] listHeader = {"Chores To Do", "Extra Description", "Housekeeper"};
+		String[] blankHeader = {"", "", "", ""};
+		
+		choreList.add(0, blankHeader);
+		choreList.add(0, listHeader);
+		
+		try
+		{
+			//create file writing code.
+			outputFile = new File(outputPath);
+			fileWriter = new FileWriter(outputFile, StandardCharsets.UTF_8);
+			csvWriter = new CSVWriter(fileWriter);
+			
+			
+			csvWriter.writeAll(choreList); //write to the csv file.
+			csvWriter.close();  //saves and closes the csv file.
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	//called from main class to actually create the output file.
+	// version that uses a list of Choreboy objects instead of list of strings, to allow for formatting.
+	public void outputList(List<ChoreBoy> choreBoyList)
+	{
+		List<String> listHeader = List.of("Chores To Do", "Extra Description", "Housekeeper");
+		List<String> blankHeader = List.of("", "", "", "");
+		
+		//create a workbook
+		Workbook workbook = new XSSFWorkbook();
+		//create a sheet
+		Sheet sheet = workbook.createSheet("ChoreList");
+		//tack on the header row and blank row.
+		writeRow(sheet, listHeader);
+		writeRow(sheet, blankHeader);
+		
+		// add all the chores for each chore boy.
+		for(ChoreBoy choreBoy: choreBoyList)
+		{
+			writeChoreBoy(sheet, choreBoy);
+		}
+		
+		try(FileOutputStream fileOut = new FileOutputStream(outputPath))
+		{
+			workbook.write(fileOut);
+			workbook.close();
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	//overloaded function to work with lists instead of string arrays.
+	//function to write a list of strings to a row on a spreadsheet.
+	private static void writeRow(Sheet sheet, List<String> values) {
+		//get the number for the next row.
+		int nextRowNumb = sheet.getLastRowNum() + 1;
+		//create a new row
+		Row newRow = sheet.createRow(nextRowNumb);
+		//iteratively fill in each cell of the new row
+	    for (int col = 0; col < values.size(); col++) {
+	        newRow.createCell(col).setCellValue(values.get(col));
+	    }
+	}
+	
+	private static void writeChoreBoy(Sheet sheet, ChoreBoy choreBoy)
+	{
+		List<String[]> chores = choreBoy.getPersonalList();
+		String[] choreBoyDetails = choreBoy.getBoyDetails();
+		
+		for(String[] chore : chores)
+		{
+			//create a chore entry with the chore as well as the person details.
+			List<String> choreEntry = new ArrayList<>();
+			choreEntry.addAll(Arrays.asList(chore));
+			choreEntry.addAll(Arrays.asList(choreBoyDetails));
+			
+			//add the chore to the list
+			writeRow(sheet, choreEntry);
+		}
+	}
+
 	private String findApplicationDirectory()
 	{
 		String directoryPath;
@@ -304,30 +397,6 @@ public class ChoreIO {
 				this.peoplePool.remove(0);
 			}
 			
-		}
-		catch(IOException e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
-	public void outputList(List<String[]> choreList)
-	{
-		String[] listHeader = {"Chores To Do", "Extra Description", "Housekeeper"};
-		String[] blankHeader = {"", "", "", ""};
-		
-		choreList.add(0, blankHeader);
-		choreList.add(0, listHeader);
-		
-		try
-		{
-			//create file writing code.
-			outputFile = new File(outputPath);
-			fileWriter = new FileWriter(outputFile, StandardCharsets.UTF_8);
-			csvWriter = new CSVWriter(fileWriter);
-			
-			csvWriter.writeAll(choreList); //write to the csv file.
-			csvWriter.close();  //saves and closes the csv file.
 		}
 		catch(IOException e)
 		{

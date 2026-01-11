@@ -11,6 +11,7 @@ public class App {
 		List<String[]> chorePool;
 		List<String[]> peoplePool;
 		List<String[]> choreList;
+		List<ChoreBoy> choreBoyList;
 		boolean includesWorkload;
 		
 		try
@@ -32,10 +33,11 @@ public class App {
 			
 			System.out.print("\nSTATUS: Generating new chore list.\n");
 			GenerateList list = new GenerateList(peoplePool, chorePool, includesWorkload);
-			choreList = list.getChoreList();
+			//choreList = list.getChoreList(); //FIXME: instead of using the preformatted list of chores, in order to have formatting the list of choreboy objects is used.
+			choreBoyList = list.getChoreBoyList();
 			
 			System.out.print("\nSTATUS: Saving new chore list.\n");
-			choresInput.outputList(choreList);
+			choresInput.outputList(choreBoyList);
 		}
 		catch(Exception e)
 		{

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+//This class is probably the only class that actually needs to be nonstatic. Each chore boy object represents one person, who has their own list of chores.
 public class ChoreBoy  implements Comparable<ChoreBoy>{
 	//default is Hazel because lol
 	private String name = "Hazel";
