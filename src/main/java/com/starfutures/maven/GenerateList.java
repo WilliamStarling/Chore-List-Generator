@@ -41,6 +41,8 @@ public class GenerateList
 			generateList();
 			
 			//turn the collection of chore people into a single list of string arrays.
+			//FIXME: It is worth noting that after enabling formatting, the combing of chore boy lists happens inside the output class now. 
+			//So the formatting functions and involved variables are no longer needed.
 			formatChoreList();			
 		} 
 		catch (Exception e)
@@ -78,7 +80,7 @@ public class GenerateList
 		{
 			Collections.shuffle(choreBoyList); //shuffle the chore boy list, so that people get different groupings of chores.
 			//shuffle the list each time, so one or two people don't get completely bogged down with single chores.
-			System.out.println("Giving " + chore[0] + " To " + hasSmallestWorkload().getName() + " with workload " + hasSmallestWorkload().getWorkload());
+			System.out.println("Giving " + chore[0] + " of workload " + chore[chore.length -1] + " To " + hasSmallestWorkload().getName() + ", new workload is " + (hasSmallestWorkload().getWorkload() + Integer.parseInt(chore[chore.length -1])));
 			hasSmallestWorkload().addChore(chore, this.includesWorkload);
 		}
 		
@@ -127,6 +129,12 @@ public class GenerateList
 	public List<String[]> getChoreList()
 	{
 		return this.choreList;
+	}
+	
+	//GETTER method: returns the group of chore boys, each with a set of chores.
+	public List<ChoreBoy> getChoreBoyList()
+	{
+		return this.choreBoyList;
 	}
 	
 }

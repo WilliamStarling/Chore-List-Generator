@@ -1,6 +1,6 @@
 [Setup]
 AppName=Chore List Generator
-AppVersion=1.0
+AppVersion=1.1
 AppPublisher=StarFutures
 DefaultDirName={autopf}\ChoreListGenerator
 DefaultGroupName=Chore List Generator

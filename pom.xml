@@ -5,7 +5,7 @@
 
 	<groupId>com.starfutures.maven</groupId>
 	<artifactId>chore-list-generator</artifactId>
-	<version>1.0</version>
+	<version>1.1</version>
 
 	<name>chore-list-generator</name>
 	<description>A simple chore-list-generator.</description>
@@ -28,6 +28,11 @@
 			<groupId>com.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
 			<version>4.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>5.2.1</version>
 		</dependency>
 	</dependencies>
 

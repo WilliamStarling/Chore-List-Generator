@@ -2,6 +2,8 @@ package com.starfutures.maven;
 
 import javax.swing.JOptionPane; //FIXME: delete, library used for debugging
 
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
@@ -21,7 +24,7 @@ public class ChoreIO {
 	private String basePath; //string to store the path to the app.
 	private String chorePath = "/ChoreListGenerator_Inputs/ChorePool.csv"; // the path/name of the chore list file.
 	private String peoplePath = "/ChoreListGenerator_Inputs/PeoplePool.csv"; //the path for the list of people.
-	private String outputPath = "/ChorelistGenerator_Output/ChoreList.csv";
+	private String outputPath = "/ChorelistGenerator_Output/ChoreList.xlsx"; //updated extension to be xlsx to support formatting.
 	private static String templateChorePath = "/templates/ChorePool.csv";
 	private static String templatePeoplePath = "/templates/PeoplePool.csv";
 	private List<String[]> peoplePool;
@@ -66,6 +69,57 @@ public class ChoreIO {
 		sanitizePeopleInput();
 	}
 	
+	//called from main class to actually create the output file.
+	//This method is no longer used, The other version below is instead in favor of having formatting.
+	//it might not work, since it tries to write a csv object to a file with .xlsx extension.
+	//tried to overload the methods, but didn't work since both parameters were of type list.
+	public void outputListOld(List<String[]> choreList)
+	{
+		String[] listHeader = {"Chores To Do", "Extra Description", "Housekeeper"};
+		String[] blankHeader = {"", "", "", ""};
+		
+		choreList.add(0, blankHeader);
+		choreList.add(0, listHeader);
+		
+		try
+		{
+			//create file writing code.
+			outputFile = new File(outputPath);
+			fileWriter = new FileWriter(outputFile, StandardCharsets.UTF_8);
+			csvWriter = new CSVWriter(fileWriter);
+			
+			
+			csvWriter.writeAll(choreList); //write to the csv file.
+			csvWriter.close();  //saves and closes the csv file.
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	//called from main class to actually create the output file.
+	// version that uses a list of Choreboy objects instead of list of strings, to allow for formatting.
+	public void outputList(List<ChoreBoy> choreBoyList)
+	{
+		
+		//create a workbook
+		Workbook workbook = new XSSFWorkbook();
+		//create a sheet
+		Sheet sheet = workbook.createSheet("ChoreList");
+		
+		ListFormatting formattedList = new ListFormatting(workbook, sheet, choreBoyList);
+		
+		try(FileOutputStream fileOut = new FileOutputStream(outputPath))
+		{
+			workbook.write(fileOut);
+			workbook.close();
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
 	private String findApplicationDirectory()
 	{
 		String directoryPath;
@@ -304,30 +358,6 @@ public class ChoreIO {
 				this.peoplePool.remove(0);
 			}
 			
-		}
-		catch(IOException e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
-	public void outputList(List<String[]> choreList)
-	{
-		String[] listHeader = {"Chores To Do", "Extra Description", "Housekeeper"};
-		String[] blankHeader = {"", "", "", ""};
-		
-		choreList.add(0, blankHeader);
-		choreList.add(0, listHeader);
-		
-		try
-		{
-			//create file writing code.
-			outputFile = new File(outputPath);
-			fileWriter = new FileWriter(outputFile, StandardCharsets.UTF_8);
-			csvWriter = new CSVWriter(fileWriter);
-			
-			csvWriter.writeAll(choreList); //write to the csv file.
-			csvWriter.close();  //saves and closes the csv file.
 		}
 		catch(IOException e)
 		{
