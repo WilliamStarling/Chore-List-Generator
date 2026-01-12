@@ -80,7 +80,7 @@ public class GenerateList
 		{
 			Collections.shuffle(choreBoyList); //shuffle the chore boy list, so that people get different groupings of chores.
 			//shuffle the list each time, so one or two people don't get completely bogged down with single chores.
-			System.out.println("Giving " + chore[0] + " To " + hasSmallestWorkload().getName() + " with workload " + hasSmallestWorkload().getWorkload());
+			System.out.println("Giving " + chore[0] + " of workload " + chore[chore.length -1] + " To " + hasSmallestWorkload().getName() + ", new workload is " + (hasSmallestWorkload().getWorkload() + Integer.parseInt(chore[chore.length -1])));
 			hasSmallestWorkload().addChore(chore, this.includesWorkload);
 		}
 		
