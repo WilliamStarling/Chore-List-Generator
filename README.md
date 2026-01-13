@@ -6,7 +6,7 @@ It's recommended to place the application in a folder in your desktop, due to ho
 
 ### Windows
 1. Download the "ChoreListGenerator_Installer_Windows.exe" file inside of the "installers" folder.
-2. Double click to install, and pick a location to install the application to!
+2. Double click to install, and pick a location to install the application to! You don't want to use the default location of Program Files, since the app won't have permissions here. Instead, pick the desktop or another place it will!
 
 ### Mac
 1. Download the "ChoreListGenerator_Installer_Mac.dmg" file inside of the "installers" folder.
