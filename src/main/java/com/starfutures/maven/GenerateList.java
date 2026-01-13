@@ -78,9 +78,16 @@ public class GenerateList
 		//this should cycle through each chore, and give it to the person with the smallest workload.
 		for(String[] chore : this.chorePool)
 		{
+			//FIXME: because the workload might be empty since that's only fixed in ChoreBoy, have to have this code to make the workload 1 by default and only use parseInt if we know the workload is included.
+			//otherwise, using this in the print statement breaks it.
+			int currentWorkload = 1;
+			if(this.includesWorkload)
+			{
+				currentWorkload = Integer.parseInt(chore[chore.length -1]);
+			}
 			Collections.shuffle(choreBoyList); //shuffle the chore boy list, so that people get different groupings of chores.
 			//shuffle the list each time, so one or two people don't get completely bogged down with single chores.
-			System.out.println("Giving " + chore[0] + " of workload " + chore[chore.length -1] + " To " + hasSmallestWorkload().getName() + ", new workload is " + (hasSmallestWorkload().getWorkload() + Integer.parseInt(chore[chore.length -1])));
+			System.out.println("Giving " + chore[0] + " of workload " + currentWorkload + " To " + hasSmallestWorkload().getName() + ", new workload is " + (hasSmallestWorkload().getWorkload() + currentWorkload));
 			hasSmallestWorkload().addChore(chore, this.includesWorkload);
 		}
 		

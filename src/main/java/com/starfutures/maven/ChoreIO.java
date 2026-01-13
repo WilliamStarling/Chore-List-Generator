@@ -64,7 +64,6 @@ public class ChoreIO {
 		 * it would make much more sense to add the default values in here, like what I do with the prepicked input.
 		 */
 		sanitizePrepickedInput();
-		printList(this.prepickedChores); //FIXME: printing out the default chores to verify sanitization.
 	} 
 	
 	//overloaded constructor where file paths are specified.
