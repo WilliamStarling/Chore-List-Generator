@@ -4,6 +4,7 @@
 package com.starfutures.maven;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -19,14 +20,16 @@ public class GenerateList
 	private List<String[]> peoplePool;
 	private List<String[]> chorePool;
 	private List<String[]> choreList;
+	private List<String[]> prepickedChores;
 	private List<ChoreBoy> choreBoyList;
 	private boolean includesWorkload;
 	
-	GenerateList(List<String[]> peoplePool, List<String[]> chorePool, boolean includesWorkload)
+	GenerateList(List<String[]> peoplePool, List<String[]> chorePool, List<String[]> prepickedChores, boolean includesWorkload)
 	{
 		this.includesWorkload = includesWorkload;
 		this.peoplePool = peoplePool;
 		this.chorePool = chorePool;
+		this.prepickedChores = prepickedChores;
 		
 		//instantiate the lists as empty.
 		this.choreList = new ArrayList<String[]>(); 
@@ -38,7 +41,7 @@ public class GenerateList
 			randomizeChorePool();
 			
 			//generate a chorelist.
-			generateList();
+			generateListAlgo();
 			
 			//turn the collection of chore people into a single list of string arrays.
 			//FIXME: It is worth noting that after enabling formatting, the combing of chore boy lists happens inside the output class now. 
@@ -67,7 +70,7 @@ public class GenerateList
 	}
 	
 	//generates a list of chores using the Greedy Number Partitioning algorithm (aka Largest Possible TIme) so that they're assigned evenly.
-	private void generateList()
+	private void generateListAlgo()
 	{
 		//creates chore boys objects for each person, to hold their chores.
 		for(String[] choreBoy: this.peoplePool)
@@ -75,12 +78,48 @@ public class GenerateList
 			this.choreBoyList.add(new ChoreBoy(choreBoy));
 		}
 		
+		//Go ahead and add all the preassigned chores first.
+		for(String[] choreAssignment : this.prepickedChores)
+		{
+			//split the assignment into a chore and a person.
+			String[] pureChore = Arrays.copyOfRange(choreAssignment, 0, choreAssignment.length -1); //-1 to avoid copying the name.
+			String housekeeper = choreAssignment[choreAssignment.length -1].strip();
+			boolean succesfullyAssigned = false;
+			
+			//search to find the corresponding choreboy.
+			for (ChoreBoy choreBoy: this.choreBoyList)
+			{
+				if(housekeeper.equalsIgnoreCase(choreBoy.getName().strip()))
+				{
+					//add the chore to the person
+					choreBoy.addChore(pureChore, this.includesWorkload);
+					succesfullyAssigned = true;
+					break;
+				}
+			}
+			//make a new chore person if the one specified didn't exist.
+			if(!succesfullyAssigned)
+			{
+				String[] housekeeperDetails = {housekeeper}; //place the name inside a string array so it can be passsed into the constructor
+				ChoreBoy newChoreBoy = new ChoreBoy(housekeeperDetails);
+				newChoreBoy.addChore(pureChore,  this.includesWorkload);
+				this.choreBoyList.add(newChoreBoy);
+			}
+		}
+		
 		//this should cycle through each chore, and give it to the person with the smallest workload.
 		for(String[] chore : this.chorePool)
 		{
+			//FIXME: because the workload might be empty since that's only fixed in ChoreBoy, have to have this code to make the workload 1 by default and only use parseInt if we know the workload is included.
+			//otherwise, using this in the print statement breaks it.
+			int currentWorkload = 1;
+			if(this.includesWorkload)
+			{
+				currentWorkload = Integer.parseInt(chore[chore.length -1]);
+			}
 			Collections.shuffle(choreBoyList); //shuffle the chore boy list, so that people get different groupings of chores.
 			//shuffle the list each time, so one or two people don't get completely bogged down with single chores.
-			System.out.println("Giving " + chore[0] + " of workload " + chore[chore.length -1] + " To " + hasSmallestWorkload().getName() + ", new workload is " + (hasSmallestWorkload().getWorkload() + Integer.parseInt(chore[chore.length -1])));
+			System.out.println("\tGiving " + chore[0] + " of workload " + currentWorkload + " To " + hasSmallestWorkload().getName() + ", new workload is " + (hasSmallestWorkload().getWorkload() + currentWorkload));
 			hasSmallestWorkload().addChore(chore, this.includesWorkload);
 		}
 		

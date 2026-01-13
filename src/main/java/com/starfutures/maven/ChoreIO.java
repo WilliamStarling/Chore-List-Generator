@@ -24,11 +24,14 @@ public class ChoreIO {
 	private String basePath; //string to store the path to the app.
 	private String chorePath = "/ChoreListGenerator_Inputs/ChorePool.csv"; // the path/name of the chore list file.
 	private String peoplePath = "/ChoreListGenerator_Inputs/PeoplePool.csv"; //the path for the list of people.
+	private String prepickedPath = "/ChoreListGenerator_Inputs/PrepickedChores.csv"; //people with chores predetermined.
 	private String outputPath = "/ChorelistGenerator_Output/ChoreList.xlsx"; //updated extension to be xlsx to support formatting.
 	private static String templateChorePath = "/templates/ChorePool.csv";
 	private static String templatePeoplePath = "/templates/PeoplePool.csv";
+	private static String templatePrepickedPath = "/templates/PrepickedChores.csv";
 	private List<String[]> peoplePool;
 	private List<String[]> chorePool;
+	private List<String[]> prepickedChores;
 	private boolean includesWorkload;
 	private File outputFile;
 	private FileWriter fileWriter;
@@ -41,19 +44,26 @@ public class ChoreIO {
 	    
 		this.chorePath = basePath.concat(chorePath); //adds the location of the folders onto the relative path.
 		this.peoplePath = basePath.concat(peoplePath);
+		this.prepickedPath = basePath.concat(prepickedPath);
 		this.outputPath = basePath.concat(outputPath); //goes ahead and updates the output path too.
 		//System.out.println("relative Paths: " + chorePath + "\n" + peoplePath);
 		/*JOptionPane.showMessageDialog(null, "relative Paths: " + chorePath + "\n" + peoplePath, "Chore List Generator", 
                 JOptionPane.INFORMATION_MESSAGE);*/ //FIXME: this and previous lines are for debug.
 		
-		enforceIOFolders(chorePath, peoplePath, outputPath);
+		enforceIOFolders(chorePath, peoplePath, prepickedPath, outputPath);
 		
 		//uses the default file paths.
 		this.peoplePool = readCSV(peoplePath);
 		this.chorePool = readCSV(chorePath);
+		this.prepickedChores = readCSV(prepickedPath);
 		
 		sanitizeChoreInput();
 		sanitizePeopleInput();
+		/*
+		 * FIXME In hind sight, I realize rather then this class tell the other classes if the workload is included, and if not the other classes add in default values,
+		 * it would make much more sense to add the default values in here, like what I do with the prepicked input.
+		 */
+		sanitizePrepickedInput();
 	} 
 	
 	//overloaded constructor where file paths are specified.
@@ -118,6 +128,7 @@ public class ChoreIO {
 		{
 			e.printStackTrace();
 		}
+		System.out.println("\nSTATUS: Chore list saved to: " + this.outputPath);
 	}
 
 	private String findApplicationDirectory()
@@ -178,17 +189,18 @@ public class ChoreIO {
 		
 	}
 	
-	private static void enforceIOFolders(String chorePath, String peoplePath, String outputPath)
+	private static void enforceIOFolders(String chorePath, String peoplePath, String prepickedPath, String outputPath)
 	{
 		File choreFile = new File(chorePath);
 		File peopleFile = new File(peoplePath);
+		File prepickedFile = new File(prepickedPath);
 		File inputFolder = choreFile.getParentFile();
 		File outputFolder = new File(outputPath).getParentFile(); //it says getParentFile but it gets folders too.
 		boolean createdFile = true;
 		
 		try
 		{
-			if(choreFile.exists() && peopleFile.exists() && outputFolder.exists())
+			if(choreFile.exists() && peopleFile.exists() && prepickedFile.exists() && outputFolder.exists())
 			{
 				return; //If both the input files and the output folder already exist, just return, do not need to bother making new ones.
 			}
@@ -214,6 +226,8 @@ public class ChoreIO {
 				
 				copyFile(templateChorePath, choreFile);
 				copyFile(templatePeoplePath, peopleFile);
+				copyFile(templatePrepickedPath, prepickedFile);
+				
 				
 				return; //if this has been done, then nothing is left missing.
 			}
@@ -226,6 +240,10 @@ public class ChoreIO {
 			{
 				copyFile(templatePeoplePath, peopleFile);
 			}	
+			if(!prepickedFile.exists())
+			{
+				copyFile(templatePrepickedPath, prepickedFile);
+			}
 		}
 		catch (IOException e)
 		{
@@ -306,7 +324,7 @@ public class ChoreIO {
 			
 			if(!(choresHeader[0].toLowerCase().equals("chore to do")) || !(choresHeader[1].toLowerCase().equals("extra notes")))
 			{
-				throw new IOException("ERROR: 'Chores to Do' and/or 'Extra Description' columns improperly named.");
+				throw new IOException("ERROR: 'Chores to Do' and/or 'Extra Description' columns in ChorePool.csv improperly named.");
 			}
 			
 			if(choresHeader.length == 2)
@@ -347,7 +365,7 @@ public class ChoreIO {
 			
 			if(!(peopleHeader[0].toLowerCase().equals("housekeepers")))
 			{
-				throw new IOException ("ERROR: Expected first column to be named 'Housekeepers'.");
+				throw new IOException ("ERROR: Expected first column in PeoplePool.csv to be named 'Housekeepers'.");
 			}
 			
 			peoplePool.remove(0); //remove the header row.
@@ -358,6 +376,74 @@ public class ChoreIO {
 				this.peoplePool.remove(0);
 			}
 			
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	private void sanitizePrepickedInput()
+	{
+		String[] prepickedHeader = this.prepickedChores.get(0);
+		try
+		{
+			//First, try to make sure the headers match expectations.
+			if(prepickedHeader.length != 3 && prepickedHeader.length != 4)
+			{
+				throw new IOException("ERROR: improper PrepickedChores.csv formatting. Expected 3 or 4 columns.");
+			}
+			
+			//check that the column headers are properly named
+			if(!(prepickedHeader[0].toLowerCase().equals("chore to do")) || !(prepickedHeader[1].toLowerCase().equals("extra notes") || !(prepickedHeader[-1].toLowerCase().equals("housekeeper"))))
+			{
+				throw new IOException("ERROR: 'Chores to Do' and/or 'Extra Description' and/or 'Housekeeper' columns in PrepickedChores.csv improperly named.");
+			}
+			if(this.includesWorkload == true && prepickedHeader[2].toLowerCase().equals("Workload"))
+			{
+				throw new IOException("ERROR: 'Workload' column improperly named.");
+			}
+			
+			//then remove the headers from input.
+			this.prepickedChores.remove(0);
+			
+			if(this.prepickedChores.size() == 0) return; //exit cleaning if there aren't any preassigned chores.
+			
+			//I'm going to add an extra blank header to between the header and actual values, to improve readability.
+			//This will need to be removed too for it to function, but I want it to work without it so check if it's even there.
+			if(this.prepickedChores.get(0)[0].equals("") || this.prepickedChores.get(0)[0].isBlank())
+			{
+				this.prepickedChores.remove(0);
+			}
+			
+			//first, if everything looks good then just leave.
+			if((this.includesWorkload == true && prepickedHeader.length == 4) || (this.includesWorkload == false && prepickedHeader.length == 3))
+			{
+				//if the chore pool includes the workload, check the preadded chores is big enough to as well. 
+				//if it doens't include the header, check the preadded chores is small enough to as well.
+				return;
+			}
+			
+			//now if it's supposed to include the workload, insert a default value of 1
+			if((this.includesWorkload == true && prepickedHeader.length == 3))
+			{
+				for(int choreNumb = 0; choreNumb < prepickedChores.size(); choreNumb++)
+				{
+					List<String> fixedChore = new ArrayList<>(Arrays.asList(prepickedChores.get(choreNumb)));
+					fixedChore.add(2, "1");
+					prepickedChores.set(choreNumb, fixedChore.toArray(new String[fixedChore.size()]));
+				}
+			}
+			//now if it's NOT supposed to include the workload, remove the workload.
+			else if((this.includesWorkload == false && prepickedHeader.length == 4))
+			{
+				for(int choreNumb = 0; choreNumb < prepickedChores.size(); choreNumb++)
+				{
+					List<String> fixedChore = new ArrayList<>(Arrays.asList(prepickedChores.get(choreNumb)));
+					fixedChore.remove(2);
+					prepickedChores.set(choreNumb, fixedChore.toArray(new String[fixedChore.size()]));
+				}
+			}
 		}
 		catch(IOException e)
 		{
@@ -381,5 +467,11 @@ public class ChoreIO {
 	public boolean getIncludesWorkload()
 	{
 		return this.includesWorkload;
+	}
+	
+	//GETTER method: returns the extra prepicked chores.
+	public List<String[]> getPrepickedChores()
+	{
+		return this.prepickedChores;
 	}
 }

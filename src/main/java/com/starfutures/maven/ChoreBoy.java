@@ -34,6 +34,7 @@ public class ChoreBoy  implements Comparable<ChoreBoy>{
 		{
 			e.printStackTrace();
 		}
+		
 	}
 	
 	//add a chore to this persons chore list.
