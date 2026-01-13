@@ -406,6 +406,9 @@ public class ChoreIO {
 			
 			//then remove the headers from input.
 			this.prepickedChores.remove(0);
+			
+			if(this.prepickedChores.size() == 0) return; //exit cleaning if there aren't any preassigned chores.
+			
 			//I'm going to add an extra blank header to between the header and actual values, to improve readability.
 			//This will need to be removed too for it to function, but I want it to work without it so check if it's even there.
 			if(this.prepickedChores.get(0)[0].equals("") || this.prepickedChores.get(0)[0].isBlank())

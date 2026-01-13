@@ -5,7 +5,7 @@
 
 	<groupId>com.starfutures.maven</groupId>
 	<artifactId>chore-list-generator</artifactId>
-	<version>1.1</version>
+	<version>1.2</version>
 
 	<name>chore-list-generator</name>
 	<description>A simple chore-list-generator.</description>
