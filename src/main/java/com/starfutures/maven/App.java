@@ -4,6 +4,12 @@ import java.util.List;
 
 public class App {
 
+	/*
+	 * 4. seperate the chore from the name.
+	 * 2. for each item listed, compare the name in  the 4th column against each chore person's name until you find a match. if no match, add a new person.\
+	 * 3. add the chore to that person. 
+	 */
+	
 	public static void main(String[] args) {
 		String choresPath; // the path/name of the chore list file.
 		String peoplePath;
@@ -41,9 +47,12 @@ public class App {
 		}
 		catch(Exception e)
 		{
-			System.out.println(e);
+			e.printStackTrace();
+			/*
 			System.out.println("\nWARNING: Please type the name of the chore file and people file after the program name in the following format surounded by quotation marks.");
 			System.out.println("ChoreList \"ChoreSelection.csv\" \"PeopleSelection.csv\"");
+			*/
+			System.out.println("ERROR: Unkown issue occured. Please contact William Starling at williamjonas@comcast.net with as many details you can about what you were doing when this occured.");
 		}
 
 	}
