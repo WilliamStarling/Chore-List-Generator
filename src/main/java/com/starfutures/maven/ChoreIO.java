@@ -128,6 +128,7 @@ public class ChoreIO {
 		{
 			e.printStackTrace();
 		}
+		System.out.println("\nSTATUS: Chore list saved to: " + this.outputPath);
 	}
 
 	private String findApplicationDirectory()

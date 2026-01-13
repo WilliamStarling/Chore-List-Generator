@@ -17,12 +17,13 @@ public class App {
 		List<String[]> chorePool;
 		List<String[]> peoplePool;
 		List<String[]> choreList;
+		List<String[]> prepickedChores;
 		List<ChoreBoy> choreBoyList;
 		boolean includesWorkload;
 		
 		try
 		{
-			System.out.print("\nSTATUS: Reading inputs.\n");
+			System.out.println("\nSTATUS: Reading inputs.");
 			if (args.length == 2)
 			{
 				choresPath = args[0];
@@ -34,16 +35,18 @@ public class App {
 			}
 			peoplePool = choresInput.getPeoplePool();
 			chorePool = choresInput.getChorePool();
+			prepickedChores = choresInput.getPrepickedChores();
 			
 			includesWorkload = choresInput.getIncludesWorkload();
 			
-			System.out.print("\nSTATUS: Generating new chore list.\n");
-			GenerateList list = new GenerateList(peoplePool, chorePool, includesWorkload);
+			System.out.println("\nSTATUS: Generating new chore list.\n");
+			GenerateList list = new GenerateList(peoplePool, chorePool, prepickedChores, includesWorkload);
 			//choreList = list.getChoreList(); //FIXME: instead of using the preformatted list of chores, in order to have formatting the list of choreboy objects is used.
 			choreBoyList = list.getChoreBoyList();
 			
-			System.out.print("\nSTATUS: Saving new chore list.\n");
+			System.out.println("\nSTATUS: Saving new chore list.");
 			choresInput.outputList(choreBoyList);
+			System.out.println("\nSTATUS: Finished!");
 		}
 		catch(Exception e)
 		{
