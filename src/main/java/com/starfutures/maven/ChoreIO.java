@@ -112,10 +112,16 @@ public class ChoreIO {
 	public void outputList(List<ChoreBoy> choreBoyList)
 	{
 		
-		//create a workbook
+		//create a workbook.
 		Workbook workbook = new XSSFWorkbook();
 		//create a sheet
 		Sheet sheet = workbook.createSheet("ChoreList");
+		//Setup sheet format
+		PrintSetup printSetup = sheet.getPrintSetup();
+		printSetup.setLandscape(false); //only want portrait mode
+		sheet.setFitToPage(true); //uses smart "fit-to-page scaling instead of percentages.
+		printSetup.setFitWidth((short) 1);
+		printSetup.setFitHeight((short) 0);
 		
 		ListFormatting formattedList = new ListFormatting(workbook, sheet, choreBoyList);
 		

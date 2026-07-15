@@ -18,6 +18,7 @@ public class ListFormatting
 {
 	final Font headerFont;
 	final Font highlightFont;
+	final Font defaultFont;
 	
 	final CellStyle headerStyle; //cell style for the header cells.
 	final CellStyle topPlainStyle; //top of a group, normal cell.
@@ -32,9 +33,14 @@ public class ListFormatting
 		/*---------------------- !^ Style Definitions !^ ---------------------------------------*/
 		headerFont = workbook.createFont();
 		headerFont.setBold(true);
+		headerFont.setFontHeightInPoints((short) 15);
 		
 		highlightFont = workbook.createFont();
 		highlightFont.setColor(IndexedColors.RED.getIndex());
+		highlightFont.setFontHeightInPoints((short) 15);
+		
+		defaultFont = workbook.createFont();
+		defaultFont.setFontHeightInPoints((short) 15);
 		
 		
 		headerStyle = workbook.createCellStyle();
@@ -46,18 +52,21 @@ public class ListFormatting
 		
 		topPlainStyle = workbook.createCellStyle();
 		topPlainStyle.setWrapText(true);
+		topPlainStyle.setFont(defaultFont);
 		topPlainStyle.setBorderTop(BorderStyle.THICK);
 		topPlainStyle.setBorderBottom(BorderStyle.DASHED);
 		topPlainStyle.setVerticalAlignment(VerticalAlignment.TOP);
 		
 		plainStyle = workbook.createCellStyle();
 		plainStyle.setWrapText(true);
+		plainStyle.setFont(defaultFont);
 		plainStyle.setBorderTop(BorderStyle.DASHED);
 		plainStyle.setBorderBottom(BorderStyle.DASHED);
 		plainStyle.setVerticalAlignment(VerticalAlignment.TOP);
 		
 		bottomPlainStyle = workbook.createCellStyle();
 		bottomPlainStyle.setWrapText(true);
+		bottomPlainStyle.setFont(defaultFont);
 		bottomPlainStyle.setBorderTop(BorderStyle.DASHED);
 		bottomPlainStyle.setBorderBottom(BorderStyle.THICK);
 		bottomPlainStyle.setVerticalAlignment(VerticalAlignment.TOP);
@@ -86,9 +95,9 @@ public class ListFormatting
 		/*---------------------- ^ Style Definitions ^ ---------------------------------------*/
 		
 		//set the column widths, so that everything fits on one page.
-		sheet.setColumnWidth(0, 42 * 256); //the size in excel was 42, and POI uses 1/256th of a character unit.
-		sheet.setColumnWidth(1, 36 * 256);
-		sheet.setColumnWidth(2, 12 * 256);
+		sheet.setColumnWidth(0, 43 * 256); //the size in excel was 42, and POI uses 1/256th of a character unit.
+		sheet.setColumnWidth(1, 33 * 256);
+		sheet.setColumnWidth(2, 17 * 256);
 		sheet.setColumnWidth(3, (int) (0.5 * 256)); //shh
 		
 		List<String> listHeader = List.of("Chores To Do", "Extra Description", "Housekeeper");

@@ -1,12 +1,12 @@
 [Setup]
 AppName=Chore List Generator
-AppVersion=1.2.1
+AppVersion=1.3.0
 AppPublisher=StarFutures
 DefaultDirName={autopf}\ChoreListGenerator
 DefaultGroupName=Chore List Generator
 UninstallDisplayIcon={app}\chore-list-generator.exe
 OutputDir=.
-OutputBaseFilename=ChoreListGenerator_Installer_Windows_1.2.1
+OutputBaseFilename=ChoreListGenerator_Installer_Windows_1.3.0
 Compression=lzma2
 SolidCompression=yes
 ; Uncomment the next line if you want to require admin rights
