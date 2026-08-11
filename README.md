@@ -12,6 +12,10 @@ It's recommended to place the application in a folder in your desktop, due to ho
 1. Download the "ChoreListGenerator_Installer_Mac.dmg" file inside of the "installers" folder.
 2. Double click to install, and drag the application to where you want it to be.
 3. Instead of dragging it into the "Applications" folder like it asks, it's recommended to instead drag it into a dedicated folder for the app on your desktop!
+4. Try to run the chore-list-generator application. It will give you an error. This was expected.
+5. If you trust me, tell your computer to open the app anyways. Open "System Settings" and enter "Privacy & Security".
+6. Scroll down to the message about chore-list-generator being blocked, and click "Open Anyways".
+7. It should run succesfully from now on!
 
 ## How to Use
 1. Double click the app to run it. The first time you run it, it will automatically create folders labeled "ChoreListGenerator_Inputs" and "ChoreListGenerator_Output". These are how you interact with the application!
